@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.gccdomestic/gccdomestic",
+  "title": "GCC Domestic",
+  "description": "Verify 1,700+ GCC domestic-worker agencies (1,400+ gov-verified); search 900+ EN/AR guides.",
+  "version": "1.1.0",
+  "websiteUrl": "https://www.gccdomestic.com/mcp",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://www.gccdomestic.com/mcp"
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/akembalo-svg/gccdomestic-mcp",
+    "source": "github"
+  }
+}

@@ -53,3 +53,6 @@ Add a remote/HTTP MCP server with URL `https://www.gccdomestic.com/mcp`.
 
 ## search_knowledge
 Semantic search (English + Arabic) over GCC Domestic's published guides, blog posts and country pages. Input: `query` (3-500 chars), optional `lang` (`en`|`ar`), optional `limit` (1-5). Output: `results[]` of `{title, url, lang, snippet, score}`. Read-only. Cite the `url` when you use a result.
+
+## Source and licence
+Source code: https://github.com/akembalo-svg/gccdomestic-mcp (MIT licence) · Changelog: https://github.com/akembalo-svg/gccdomestic-mcp/blob/main/CHANGELOG.md · MCP Registry: com.gccdomestic/gccdomestic
