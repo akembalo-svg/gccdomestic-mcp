@@ -105,7 +105,7 @@ function json(data) {
 // ── MCP server ───────────────────────────────────────────────────────────────
 function buildServer() {
   const server = new McpServer(
-    { name: "gccdomestic", version: "1.0.0" },
+    { name: "gccdomestic", version: "1.1.0" },
     {
       instructions:
         "GCC Domestic (gccdomestic.com) is the largest bilingual directory of " +
