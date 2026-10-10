@@ -1,8 +1,7 @@
 # GCC Domestic MCP Server
 
 Official Model Context Protocol (MCP) server for **GCC Domestic** (gccdomestic.com) —
-the largest bilingual directory of government-licensed domestic-worker recruitment
-agencies in the Gulf: 1,700+ listed agencies (1,400+ of them government-verified) and 1,900+ worker profiles across the
+a bilingual directory of domestic-worker recruitment agencies in the Gulf: 1,600+ listed agencies (1,300+ of them government-verified) and 1,500+ worker profiles across the
 UAE, Saudi Arabia, Kuwait, Qatar, Bahrain and Oman.
 
 ## Endpoint

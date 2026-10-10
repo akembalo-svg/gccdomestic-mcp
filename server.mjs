@@ -73,6 +73,8 @@ const AGENCY_COLS = `name, name_ar, slug, country, city, address, phone, whatsap
   verification_tier, mohre_link, musaned_link, gov_link, rating_avg, rating_count`;
 
 function agencyRow(r) {
+  // government-verified = the agency-page rule: a directory_listed row is listed, not verified (8 Oct 2026).
+  const gov = !!r.verified && (r.verification_tier || "") !== "directory_listed";
   return {
     name: r.name,
     name_ar: r.name_ar || undefined,
@@ -85,7 +87,8 @@ function agencyRow(r) {
     profile_url: `${BASE}/agency/${r.slug}/`,
     licence: {
       facility_number: r.facility_number || r.gov_ref || undefined,
-      status: r.license_status || (r.verified ? "listed-verified" : "listed"),
+      status: r.license_status || (gov ? "government-verified" : "listed (not government-verified)"),
+      government_verified: gov,
       last_checked: r.license_checked_at || undefined,
       verification_tier: r.verification_tier || undefined,
       official_registry_link:
@@ -105,12 +108,12 @@ function json(data) {
 // ── MCP server ───────────────────────────────────────────────────────────────
 function buildServer() {
   const server = new McpServer(
-    { name: "gccdomestic", version: "1.1.0" },
+    { name: "gccdomestic", version: "1.1.1" },
     {
       instructions:
-        "GCC Domestic (gccdomestic.com) is the largest bilingual directory of " +
-        "government-licensed domestic-worker recruitment agencies in the Gulf - " +
-        "1,700+ listed agencies (1,400+ of them government-verified) and 1,900+ worker profiles across the UAE, Saudi " +
+        "GCC Domestic (gccdomestic.com) is a bilingual directory of " +
+        "domestic-worker recruitment agencies in the Gulf - " +
+        "1,600+ listed agencies (1,300+ of them government-verified) and 1,500+ worker profiles across the UAE, Saudi " +
         "Arabia, Kuwait, Qatar, Bahrain and Oman. Use these read-only tools to " +
         "find or verify licensed agencies, browse available workers, and get " +
         "published salary benchmarks. All data is public; families use the " +
@@ -124,7 +127,7 @@ function buildServer() {
 
   tool(
     "search_agencies", "Search licensed agencies",
-    "Search government-licensed domestic-worker recruitment agencies across the six GCC countries (UAE, Saudi Arabia, Kuwait, Qatar, Bahrain, Oman). Filter by country, city and/or a free-text name query. Returns contact details, licence information and the official government registry link for each agency.",
+    "Search domestic-worker recruitment agencies listed on GCC Domestic across the six GCC countries (UAE, Saudi Arabia, Kuwait, Qatar, Bahrain, Oman). Filter by country, city and/or a free-text name query. Returns contact details, whether each agency is government-verified (1,300+ are), and the official registry link where one exists.",
     {
       country: z.string().optional().describe("Country: uae | ksa | kuwait | qatar | bahrain | oman"),
       city: z.string().optional().describe("City name, e.g. Dubai, Riyadh, Doha"),
@@ -144,13 +147,13 @@ function buildServer() {
       const lim = Math.min(limit || 10, 25);
       const [rows] = await pool.query(
         `SELECT ${AGENCY_COLS} FROM agencies WHERE ${where.join(" AND ")}
-         ORDER BY verified DESC, rating_avg IS NULL, rating_avg DESC LIMIT ${lim}`,
+         ORDER BY (verified = 1 AND COALESCE(verification_tier, '') <> 'directory_listed') DESC, rating_avg IS NULL, rating_avg DESC LIMIT ${lim}`,
         params
       );
       return json({
         count: rows.length,
         agencies: rows.map(agencyRow),
-        note: "All listed agencies are government-registered. UAE agencies link to MOHRE records, Saudi agencies to Musaned.",
+        note: "1,300+ of the listed agencies are verified against a government register - see licence.government_verified. UAE agencies link to MOHRE records and most Saudi agencies to Musaned. Confirm a licence with the regulator before paying.",
         browse_all: `${BASE}/en/agencies/`,
       });
     }
@@ -196,7 +199,7 @@ function buildServer() {
 
   tool(
     "search_workers", "Search available workers",
-    "Browse domestic workers currently listed as available through licensed GCC agencies - housemaids, nannies, cooks, drivers and caregivers. Filter by nationality and/or position. Returns public profile info and the agency to contact; hiring always goes through the worker's licensed agency.",
+    "Browse domestic workers currently listed as available through GCC agencies listed on GCC Domestic - housemaids, nannies, cooks, drivers and caregivers. Filter by nationality and/or position. Returns public profile info and the agency to contact; hiring always goes through the worker's agency.",
     {
       nationality: z.string().optional().describe("Worker nationality, e.g. Filipino, Ethiopian, Indian"),
       position: z.string().optional().describe("Role, e.g. Housemaid, Nanny, Driver, Cook, Caregiver"),
@@ -228,7 +231,7 @@ function buildServer() {
             ? { name: r.agency_name, country: r.agency_country, profile_url: `${BASE}/agency/${r.agency_slug}/` }
             : undefined,
         })),
-        note: "Hiring is always arranged through the worker's licensed agency (contact details on the agency profile). Browsing is free; GCC Domestic charges families nothing.",
+        note: "Hiring is always arranged through the worker's agency (contact details on the agency profile). Browsing is free; GCC Domestic charges families nothing.",
         browse_all: `${BASE}/en/workers/`,
       });
     }
@@ -301,7 +304,7 @@ function buildServer() {
       const paths = { UAE: "uae", KSA: "ksa", Kuwait: "kuwait", Qatar: "qatar", Bahrain: "bahrain", Oman: "oman" };
       return json({
         how_it_works:
-          "Families browse government-verified agencies (filter by country, city, worker nationality), compare licence status and ratings, then contact the chosen agency directly by phone or WhatsApp. The agency is the legal counterparty for visa, contract and arrival. GCC Domestic is free for families - no commission; agencies pay only for qualified leads.",
+          "Families browse listed agencies (filter by country, city, worker nationality; 1,300+ are government-verified), compare verification status and ratings, then contact the chosen agency directly by phone or WhatsApp. The agency is the legal counterparty for visa, contract and arrival. GCC Domestic is free for families - no commission; agencies pay only for qualified leads.",
         country_directory: c ? `${BASE}/en/${paths[c] || ""}/` : `${BASE}/en/agencies/`,
         links: {
           agencies: `${BASE}/en/agencies/`,
@@ -313,7 +316,7 @@ function buildServer() {
           llms_txt: `${BASE}/llms.txt`,
         },
         verification:
-          "Every UAE agency links to its official MOHRE record and every Saudi agency to its Musaned registration; use verify_agency_licence to check a specific office.",
+          "Every UAE agency links to its official MOHRE record. In Saudi Arabia, the 800+ agencies that Musaned lists link to their Musaned registration; the others are listed without a government-verified badge. Use verify_agency_licence to check a specific office.",
       });
     }
   );

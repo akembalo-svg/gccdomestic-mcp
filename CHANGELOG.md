@@ -3,6 +3,12 @@
 All notable changes to the GCC Domestic MCP server (`https://www.gccdomestic.com/mcp`, registry name `com.gccdomestic/gccdomestic`).
 Versions follow [Semantic Versioning](https://semver.org).
 
+## [1.1.1] - 2026-10-10
+### Changed
+- Counts match the live database: 1,600+ listed agencies (1,300+ of them government-verified) and 1,500+ worker profiles (was 1,700+ / 1,400+ / 1,900+). Registry description updated to match.
+- No "largest" claim, and no claim that every listed agency is government-registered: each agency now carries `licence.government_verified`, and search results put government-verified agencies first.
+- Saudi verification wording: the 800+ agencies Musaned lists link to their Musaned record; the others are listed without the badge.
+
 ## [1.1.0] - 2026-10-05
 ### Added
 - Public source repository (this one), MIT licence, `repository` field in the MCP Registry entry.

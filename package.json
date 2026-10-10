@@ -1,6 +1,6 @@
 {
   "name": "gccdomestic-mcp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "type": "module",
   "description": "Public MCP server for GCC Domestic - verified domestic-worker agency directory for the Gulf",
